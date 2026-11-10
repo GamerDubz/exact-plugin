@@ -15,3 +15,16 @@ claude plugin install exact@exact-agent-marketplace
 ```
 
 Codex: add `GamerDubz/exact-plugin` as a marketplace and enable `exact@exact-agent-marketplace`.
+
+## Data handling
+
+The plugin has no server and collects nothing. It reads and stores no personal data and
+retains nothing. The skill runs on the user's machine and touches the network only to:
+
+- clone or update `github.com/expo/exact` with git;
+- run Exact's own `setup`, which downloads the toolchains and dependencies that checkout
+  pins (Rust, Bun packages, Binaryen, Hermes bundles, crates);
+- open an issue on `github.com/expo/exact`, only when the user asks for it and approves the
+  text first.
+
+It is a developer tool, not intended for users under 18.
