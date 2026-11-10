@@ -1,0 +1,14 @@
+{
+  "name": "exact-agent-marketplace",
+  "description": "Agent skill for building apps with Exact (expo/exact)",
+  "owner": { "name": "GamerDubz" },
+  "plugins": [
+    {
+      "name": "exact",
+      "source": "./",
+      "description": "Clone expo/exact, run its setup, and follow its start-here guide to build, run and test an Exact app.",
+      "category": "development",
+      "keywords": ["exact", "contract", "cross-platform", "native"]
+    }
+  ]
+}

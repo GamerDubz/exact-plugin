@@ -1,0 +1,10 @@
+{
+  "name": "exact",
+  "version": "0.1.0",
+  "description": "Build, run and test apps with Exact (expo/exact) by cloning the upstream checkout and following its start-here guide.",
+  "author": { "name": "GamerDubz" },
+  "homepage": "https://github.com/expo/exact",
+  "repository": "https://github.com/GamerDubz/exact-plugin",
+  "license": "MIT",
+  "keywords": ["exact", "contract", "cross-platform", "native"]
+}
