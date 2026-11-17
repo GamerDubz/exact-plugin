@@ -15,8 +15,9 @@ touch the network to:
 - open an issue on `github.com/expo/exact`, only when the user asks for it and
   approves the text first.
 
-Set `EXACT_PLUGIN_NO_AUTOUPDATE=1` to skip the SessionStart probe/update. The hook
-still uses a short `git ls-remote` against `github.com/expo/exact` when enabled.
+Set `EXACT_PLUGIN_NO_AUTOUPDATE=1` to skip the SessionStart probe/update. Outside an Exact
+app or checkout the hook makes no network calls; inside one it uses a short
+`git ls-remote` against `github.com/expo/exact` when enabled.
 Platform SDKs (Xcode, Android SDK) are never installed by this plugin.
 
 Your agent's model provider sees what your agent sends it, under its own policy.

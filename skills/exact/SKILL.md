@@ -25,8 +25,8 @@ bash "${CLAUDE_PLUGIN_ROOT:-$PLUGIN_ROOT}/scripts/exact-bootstrap.sh"
 # Windows: pwsh "${env:PLUGIN_ROOT}/scripts/exact-bootstrap.ps1"
 ```
 
-`SessionStart` hooks run the same script with `--auto` (ls-remote HEAD check;
-skipped when `EXACT_PLUGIN_NO_AUTOUPDATE=1`). Use `--check` to report only.
+`SessionStart` hooks run the same script with `--auto` inside Exact apps only
+(ls-remote HEAD check; skipped elsewhere and when `EXACT_PLUGIN_NO_AUTOUPDATE=1`). Use `--check` to report only.
 
 ### Fallback (no plugin script)
 

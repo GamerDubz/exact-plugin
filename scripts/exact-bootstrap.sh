@@ -46,6 +46,24 @@ if [[ "$AUTO" -eq 1 && "${EXACT_PLUGIN_NO_AUTOUPDATE:-}" == "1" ]]; then
   exit 0
 fi
 
+# --auto only acts inside an Exact app (app.contract or exact.mjs) or the Exact
+# checkout itself (scripts/exact.mjs), searching up from the session directory.
+in_exact_project() {
+  local d
+  d="$(pwd -P 2>/dev/null)" || return 1
+  while [[ -n "$d" ]]; do
+    if [[ -f "$d/app.contract" || -f "$d/exact.mjs" || -f "$d/scripts/exact.mjs" ]]; then
+      return 0
+    fi
+    [[ "$d" == "/" ]] && break
+    d="$(dirname "$d")"
+  done
+  return 1
+}
+if [[ "$AUTO" -eq 1 ]] && ! in_exact_project; then
+  exit 0
+fi
+
 # Re-exec under timeout when requested.
 if [[ "$TIMEOUT_SECS" -gt 0 && -z "${EXACT_BOOTSTRAP_TIMED:-}" ]]; then
   export EXACT_BOOTSTRAP_TIMED=1

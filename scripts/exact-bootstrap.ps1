@@ -28,6 +28,22 @@ function Die([string]$Message) {
 
 if ($Auto -and $env:EXACT_PLUGIN_NO_AUTOUPDATE -eq '1') { exit 0 }
 
+# -Auto only acts inside an Exact app (app.contract or exact.mjs) or the Exact
+# checkout itself (scripts/exact.mjs), searching up from the session directory.
+function Test-ExactProject {
+  $d = (Get-Location).ProviderPath
+  while ($d) {
+    if ((Test-Path -LiteralPath (Join-Path $d 'app.contract')) -or
+        (Test-Path -LiteralPath (Join-Path $d 'exact.mjs')) -or
+        (Test-Path -LiteralPath (Join-Path (Join-Path $d 'scripts') 'exact.mjs'))) { return $true }
+    $parent = Split-Path -Parent $d
+    if (-not $parent -or $parent -eq $d) { break }
+    $d = $parent
+  }
+  return $false
+}
+if ($Auto -and -not (Test-ExactProject)) { exit 0 }
+
 if ($TimeoutSeconds -gt 0 -and -not $env:EXACT_BOOTSTRAP_TIMED) {
   $env:EXACT_BOOTSTRAP_TIMED = '1'
   $argList = @()
