@@ -4,7 +4,10 @@ An agent skills marketplace with one skill, `exact`. Each time it is used, the
 skill has the agent clone or fast-forward a live
 [expo/exact](https://github.com/expo/exact) checkout, check prerequisites, run
 Exact's own `setup` when the checkout moved, and follow the checkout's
-start-here guide. It vendors none of Exact and ships no scripts or hooks. Not
+start-here guide. When you start a new app, it checks
+[expo/exact-templates](https://github.com/expo/exact-templates) once for a
+whole-app template that fits (chat, landscapes, softwear and more) and makes the
+app from it. It vendors none of Exact and ships no scripts or hooks. Not
 affiliated with Expo.
 
 Primary entry: [`.agents/plugins/marketplace.json`](.agents/plugins/marketplace.json).
@@ -44,6 +47,15 @@ with the local checkout and only pulls and reruns `setup` when upstream moved,
 so an unchanged checkout costs one tiny request. Missing prerequisites (rustup,
 Bun) are installed by following their official instructions. Ask your agent to
 "set up Exact" or "update Exact" at any time to run it on demand.
+
+## Templates
+
+Templates are a one-off starting point, not something the skill keeps checking.
+Only when you ask for a new app does the agent clone `expo/exact-templates` to
+`~/.exact/templates` (once, shallow), read its `INDEX.md`, and run
+`bun new.mjs <template> <path> --name <name> --bundle-id <id>` if one fits.
+Existing apps and other Exact work never look at the templates, and the local
+copy is only pulled when you ask the agent to update the templates.
 
 ## Privacy
 

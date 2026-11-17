@@ -1,6 +1,6 @@
 ---
 name: exact
-description: Build, run and test an app with Exact (github.com/expo/exact), the all-platform runtime where the UI is written in Contract and data logic in TypeScript or Rust. Use when the user asks to make an Exact app or website, write an app.contract, run Exact's agent driver, or mentions Contract, exact.mjs, scripts/agent.mjs, or expo/exact.
+description: Build, run and test an app with Exact (github.com/expo/exact), the all-platform runtime where the UI is written in Contract and data logic in TypeScript or Rust. Use when the user asks to make an Exact app or website, write an app.contract, run Exact's agent driver, or mentions Contract, exact.mjs, scripts/agent.mjs, expo/exact, or Exact templates.
 ---
 
 # Exact
@@ -47,6 +47,34 @@ Call the checkout `<exact>` below.
 Read only that guide before starting. Do not read `AGENTS.md` (Exact's own work).
 
 ## 3. Make and verify the app
+
+### Start from a template (new apps only, once)
+
+Only when making a new app, check once whether a whole-app template from
+[expo/exact-templates](https://github.com/expo/exact-templates) fits. Skip this
+for existing apps and for any other Exact work; never re-check templates on
+later uses.
+
+1. Use `~/.exact/templates` if it exists, as it is. Otherwise clone it once:
+   `git clone --depth 1 https://github.com/expo/exact-templates.git ~/.exact/templates`.
+   Pull it only if the user asks to update the templates.
+2. Read its `INDEX.md` (or grep the `Keywords:` lines) and pick the template
+   whose kind of app matches the request. If none fits, skip to the plain
+   `exact new` below.
+3. Make the app from it with Bun:
+   ```sh
+   bun ~/.exact/templates/new.mjs <template> <path> --name <name> --bundle-id <id>
+   cd <path> && bun exact.mjs test web
+   ```
+   The template pins its own Exact commit in `<template>/exact.json`, and
+   `new.mjs` gives the app a checkout of that commit under
+   `~/.exact/exact2/`. Pass `--exact2 <exact>` only if the user wants it on
+   their own checkout. Never copy a template's `app/` by hand.
+4. Read the template's `TEMPLATE.md` (adapt, limits) and the new app's
+   `AGENTS.md`, then adapt it. The template is a one-off starting point: the
+   app does not track the template afterwards.
+
+### Or start from a pattern
 
 ```sh
 bun <exact>/scripts/exact.mjs new <path>
