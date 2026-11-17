@@ -1,7 +1,7 @@
 {
   "name": "exact",
-  "version": "0.3.1",
-  "description": "Build, run and test apps with Exact (expo/exact): auto-setup of the upstream checkout, SessionStart updates, and its start-here guide.",
+  "version": "0.4.0",
+  "description": "Build, run and test apps with Exact (expo/exact): sets up and updates the upstream checkout on use, then follows its start-here guide.",
   "author": {
     "name": "GamerDubz",
     "url": "https://github.com/GamerDubz"
@@ -18,11 +18,10 @@
     "agent-skills"
   ],
   "skills": "./skills/",
-  "hooks": "./hooks/hooks.json",
   "interface": {
     "displayName": "Exact",
     "shortDescription": "Build apps with Exact",
-    "longDescription": "Agent skill for Exact (github.com/expo/exact), the all-platform app framework where UI is written in Contract and data logic in TypeScript or Rust. After install the plugin bootstraps or updates an Exact checkout, runs its setup when HEAD moves, and sends you to the checkout's start-here guide. Use it to scaffold apps and websites, run verify, and drive hosts with Exact's agent loop. Not affiliated with Expo. Exact is pre-1.0 and changes daily.",
+    "longDescription": "Agent skill for Exact (github.com/expo/exact), the all-platform app framework where UI is written in Contract and data logic in TypeScript or Rust. Each time it is used, the skill clones or updates an Exact checkout only when upstream moved, runs its setup when needed, and sends you to the checkout's start-here guide. Use it to scaffold apps and websites, run verify, and drive hosts with Exact's agent loop. Not affiliated with Expo. Exact is pre-1.0 and changes daily.",
     "category": "Coding",
     "developerName": "GamerDubz",
     "websiteUrl": "https://github.com/GamerDubz/exact-plugin",
@@ -30,7 +29,7 @@
     "termsOfServiceUrl": "https://github.com/GamerDubz/exact-plugin/blob/main/LICENSE",
     "logo": "./.claude-plugin/icon.png",
     "defaultPrompt": [
-      "Bootstrap Exact and build a todo list app verified on web.",
+      "Set up Exact and build a todo list app verified on web.",
       "Start an Exact website from the site pattern and pass its tests.",
       "Update my Exact checkout and migrate this app's Contract after pulling."
     ]

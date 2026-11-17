@@ -1,10 +1,11 @@
 # Exact agent skills marketplace
 
-An agent skills marketplace with one skill, `exact`. After install it bootstraps
-a live [expo/exact](https://github.com/expo/exact) checkout (clone or
-fast-forward), installs missing rustup and Exact's pinned Bun, runs Exact's own
-`setup` when HEAD moves, and points the agent at the checkout's start-here
-guide. It vendors none of Exact. Not affiliated with Expo.
+An agent skills marketplace with one skill, `exact`. Each time it is used, the
+skill has the agent clone or fast-forward a live
+[expo/exact](https://github.com/expo/exact) checkout, check prerequisites, run
+Exact's own `setup` when the checkout moved, and follow the checkout's
+start-here guide. It vendors none of Exact and ships no scripts or hooks. Not
+affiliated with Expo.
 
 Primary entry: [`.agents/plugins/marketplace.json`](.agents/plugins/marketplace.json).
 Claude Code and Codex manifests are included for those agents.
@@ -33,31 +34,16 @@ claude plugin install exact@exact-agent-marketplace
 ```
 
 Manual: copy [`skills/exact/SKILL.md`](skills/exact/SKILL.md) into your agent's
-skills directory, or run [`scripts/exact-bootstrap.sh`](scripts/exact-bootstrap.sh)
-(Windows: [`scripts/exact-bootstrap.ps1`](scripts/exact-bootstrap.ps1)) yourself.
+skills directory.
 
-## Auto-setup and auto-update
+## Setup and updates
 
-- **Bootstrap:** `scripts/exact-bootstrap.sh` (or `.ps1`) ensures `$EXACT` or
-  `~/exact`, pulls with `--ff-only` (warns and keeps local commits if dirty),
-  installs missing toolchains with the official installers, and runs
-  `bun scripts/exact.mjs setup` only when the checkout HEAD changed since the
-  last successful setup.
-- **SessionStart:** Claude Code and Codex load `hooks/hooks.json`, which runs
-  the bootstrap in `--auto` mode. It does nothing unless the session is inside
-  an Exact app (a folder, or a parent of it, with `app.contract` or
-  `exact.mjs`) or the Exact checkout itself. There, it probes
-  `git ls-remote https://github.com/expo/exact.git HEAD` with a short timeout and
-  compares that to the local checkout. Matching or unreachable HEADs exit
-  immediately and silently; only when upstream has moved does it fetch,
-  fast-forward, and rerun setup. The hook is time-boxed and never fails the
-  session.
-
-To turn off the SessionStart update:
-
-```sh
-export EXACT_PLUGIN_NO_AUTOUPDATE=1
-```
+The skill keeps Exact current without any background process. Whenever it is
+used, the agent compares `git ls-remote https://github.com/expo/exact.git HEAD`
+with the local checkout and only pulls and reruns `setup` when upstream moved,
+so an unchanged checkout costs one tiny request. Missing prerequisites (rustup,
+Bun) are installed by following their official instructions. Ask your agent to
+"set up Exact" or "update Exact" at any time to run it on demand.
 
 ## Privacy
 
