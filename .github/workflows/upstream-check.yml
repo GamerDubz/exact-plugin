@@ -26,7 +26,7 @@ jobs:
           repository: expo/exact
           path: _exact_upstream
 
-      - name: Verify paths the skill and bootstrap rely on
+      - name: Verify paths the skill relies on
         id: layout
         continue-on-error: true
         shell: bash
@@ -76,41 +76,20 @@ jobs:
           fi
           echo "layout_ok=true" >> "$GITHUB_OUTPUT"
 
-      - name: Bootstrap --check
-        id: bootstrap
-        continue-on-error: true
-        shell: bash
-        env:
-          EXACT: ${{ github.workspace }}/_exact_upstream
-        run: |
-          set +e
-          chmod +x scripts/exact-bootstrap.sh
-          scripts/exact-bootstrap.sh --check
-          status=$?
-          echo "bootstrap_exit=$status" >> "$GITHUB_OUTPUT"
-          if [[ "$status" -ne 0 ]]; then
-            echo "bootstrap_ok=false" >> "$GITHUB_OUTPUT"
-            exit 1
-          fi
-          echo "bootstrap_ok=true" >> "$GITHUB_OUTPUT"
-
       - name: Open or update drift issue
         if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LAYOUT_OK: ${{ steps.layout.outputs.layout_ok }}
-          BOOTSTRAP_OK: ${{ steps.bootstrap.outputs.bootstrap_ok }}
-          BOOTSTRAP_EXIT: ${{ steps.bootstrap.outputs.bootstrap_exit }}
         run: |
           set -euo pipefail
-          TITLE="Upstream Exact layout or bootstrap drift"
+          TITLE="Upstream Exact layout drift"
           LABEL_BODY="Tracked by .github/workflows/upstream-check.yml — do not open duplicates."
 
           failed=0
           if [[ "${LAYOUT_OK:-false}" != "true" ]]; then failed=1; fi
-          if [[ "${BOOTSTRAP_OK:-false}" != "true" ]]; then failed=1; fi
 
-          existing="$(gh issue list --state open --search "in:title Upstream Exact layout or bootstrap drift" --json number,title --jq '.[] | select(.title=="Upstream Exact layout or bootstrap drift") | .number' | head -n1 || true)"
+          existing="$(gh issue list --state open --search "in:title Upstream Exact layout drift" --json number,title --jq '.[] | select(.title=="Upstream Exact layout drift") | .number' | head -n1 || true)"
 
           if [[ "$failed" -eq 0 ]]; then
             if [[ -n "${existing:-}" ]]; then
@@ -127,9 +106,8 @@ jobs:
           Commit: ${GITHUB_SHA}
 
           - Layout ok: ${LAYOUT_OK:-false}
-          - Bootstrap --check ok: ${BOOTSTRAP_OK:-false} (exit ${BOOTSTRAP_EXIT:-unknown})
 
-          The workflow only reports; it does not push commits. Inspect the job log, then update the skill/bootstrap if expo/exact moved.
+          The workflow only reports; it does not push commits. Inspect the job log, then update the skill if expo/exact moved.
           EOF
           )"
 
