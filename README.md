@@ -1,11 +1,28 @@
-# Exact agent plugin
+# Exact agent skills marketplace
 
-A Claude Code and Codex plugin with one skill, `exact`. It clones upstream
+An agent skills marketplace with one skill, `exact`. It clones upstream
 [expo/exact](https://github.com/expo/exact) at use time, runs its setup, and sends the agent
-to its start-here guide. It vendors none of Exact, so it needs no syncing: it always uses the
-latest upstream checkout. Not affiliated with Expo.
+to its start-here guide. It vendors none of Exact, so it always uses the latest upstream
+checkout. Not affiliated with Expo.
 
-This repo is the plugin (repo root) and a one-plugin marketplace.
+Primary entry: [`.agents/plugins/marketplace.json`](.agents/plugins/marketplace.json).
+Claude Code and Codex manifests are included for those agents.
+
+## Install
+
+Agents marketplace (any agent that reads `.agents/plugins/marketplace.json`):
+
+```sh
+# clone or point at GamerDubz/exact-plugin, add the marketplace, then install
+# exact@exact-agent-marketplace
+```
+
+Codex:
+
+```sh
+codex plugin marketplace add GamerDubz/exact-plugin
+codex plugin add exact@exact-agent-marketplace
+```
 
 Claude Code:
 
@@ -14,17 +31,8 @@ claude plugin marketplace add GamerDubz/exact-plugin
 claude plugin install exact@exact-agent-marketplace
 ```
 
-Codex: add `GamerDubz/exact-plugin` as a marketplace and enable `exact@exact-agent-marketplace`.
+Manual: copy [`skills/exact/SKILL.md`](skills/exact/SKILL.md) into your agent's skills directory.
 
-## Data handling
+## Privacy
 
-The plugin has no server and collects nothing. It reads and stores no personal data and
-retains nothing. The skill runs on the user's machine and touches the network only to:
-
-- clone or update `github.com/expo/exact` with git;
-- run Exact's own `setup`, which downloads the toolchains and dependencies that checkout
-  pins (Rust, Bun packages, Binaryen, Hermes bundles, crates);
-- open an issue on `github.com/expo/exact`, only when the user asks for it and approves the
-  text first.
-
-It is a developer tool, not intended for users under 18.
+See [docs/privacy.md](docs/privacy.md). Terms: [LICENSE](LICENSE).
