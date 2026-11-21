@@ -1,16 +1,37 @@
 {
   "name": "exact",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Build, run and test apps with Exact (expo/exact) by cloning the upstream checkout and following its start-here guide.",
-  "author": { "name": "GamerDubz" },
-  "homepage": "https://github.com/expo/exact",
+  "author": {
+    "name": "GamerDubz",
+    "url": "https://github.com/GamerDubz"
+  },
+  "homepage": "https://github.com/GamerDubz/exact-plugin",
   "repository": "https://github.com/GamerDubz/exact-plugin",
   "license": "MIT",
-  "keywords": ["exact", "contract", "cross-platform", "native"],
+  "keywords": [
+    "exact",
+    "expo",
+    "contract",
+    "cross-platform",
+    "native",
+    "agent-skills"
+  ],
   "skills": "./skills/",
   "interface": {
     "displayName": "Exact",
-    "shortDescription": "Build native web, macOS, iOS and Linux apps with Exact",
-    "category": "Coding"
+    "shortDescription": "Build apps with Exact",
+    "longDescription": "Agent skill for Exact (github.com/expo/exact), the all-platform app framework where UI is written in Contract and data logic in TypeScript or Rust. At use time the skill clones or updates an Exact checkout, runs its setup, and sends you to the checkout's start-here guide so you always follow current upstream docs. Use it to scaffold apps and websites, run verify, and drive hosts with Exact's agent loop. Not affiliated with Expo. Exact is pre-1.0 and changes daily.",
+    "category": "Coding",
+    "developerName": "GamerDubz",
+    "websiteUrl": "https://github.com/GamerDubz/exact-plugin",
+    "privacyPolicyUrl": "https://github.com/GamerDubz/exact-plugin/blob/main/docs/privacy.md",
+    "termsOfServiceUrl": "https://github.com/GamerDubz/exact-plugin/blob/main/LICENSE",
+    "logo": "./.claude-plugin/icon.png",
+    "defaultPrompt": [
+      "Clone expo/exact, run setup, and build a todo list app verified on web.",
+      "Start an Exact website from the site pattern and pass its tests.",
+      "Update my Exact checkout and migrate this app's Contract after pulling."
+    ]
   }
 }
