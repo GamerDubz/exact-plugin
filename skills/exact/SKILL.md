@@ -6,68 +6,65 @@ description: Build, run and test an app with Exact (github.com/expo/exact), the 
 # Exact
 
 Exact has no releases, tags or npm package. An app uses a git checkout of
-`expo/exact` by path, so this skill gets a current checkout and defers to the docs
-inside it. It is pre-1.0 and changes daily; the checkout's docs are the source of
-truth, not this file and not your memory of Exact. Not affiliated with Expo.
+`expo/exact` by path. This skill bootstraps that checkout, then defers to the
+docs inside it. Exact is pre-1.0 and changes daily; the checkout's docs are the
+source of truth. Not affiliated with Expo.
 
-## 1. Get a current checkout
+## 1. Bootstrap (setup or update)
 
-Look for an existing one first: `$EXACT`, `~/exact`, or a parent of the current
-directory containing `scripts/exact.mjs`. If none exists:
+Run the plugin's bootstrap first. It clones or fast-forwards `$EXACT` (else
+`~/exact`), installs missing rustup and the Bun version Exact pins, and runs
+`bun scripts/exact.mjs setup` only when the checkout HEAD moved since the last
+successful setup. It never discards local changes.
+
+From the installed plugin root (Claude: `$CLAUDE_PLUGIN_ROOT`; Codex:
+`$PLUGIN_ROOT` / `$CLAUDE_PLUGIN_ROOT`):
 
 ```sh
-git clone https://github.com/expo/exact.git ~/exact
+bash "${CLAUDE_PLUGIN_ROOT:-$PLUGIN_ROOT}/scripts/exact-bootstrap.sh"
+# Windows: pwsh "${env:PLUGIN_ROOT}/scripts/exact-bootstrap.ps1"
 ```
 
-If one exists, update it with `git -C <checkout> pull --ff-only`. Stop and tell the user
-if that fails because of local changes; do not discard them. Call the checkout `<exact2>`
-below.
+`SessionStart` hooks run the same script with `--auto` (ls-remote HEAD check;
+skipped when `EXACT_PLUGIN_NO_AUTOUPDATE=1`). Use `--check` to report only.
 
-## 2. Check the tools
-
-Needed: Rust through rustup, Bun at the version `package.json` pins, and a Chromium
-(Exact's setup installs Playwright's Chromium; `CHROME` may point at another). The
-macOS and iOS hosts also need Xcode; Android needs the Android SDK; Windows needs a
-Windows host. Report anything missing and let the user install it; do not install
-toolchains silently.
-
-Run once per checkout, from `<exact2>`:
+### Fallback (no plugin script)
 
 ```sh
-bun scripts/exact.mjs setup
+git clone https://github.com/expo/exact.git ~/exact   # or: git -C "$EXACT" pull --ff-only
+# install rustup from https://rustup.rs and Bun at package.json's packageManager pin
+cd "${EXACT:-$HOME/exact}" && bun scripts/exact.mjs setup
 ```
 
 `bun scripts/exact.mjs setup --check` reports prerequisites without changing the
-machine. After the checkout moves, from an app directory `bun exact.mjs update`
-reports lock drift and `bun exact.mjs lock` refreshes it.
+machine. Platform SDKs (Xcode, Android SDK) are report-only.
 
-## 3. Read the one required guide
+Call the checkout `<exact>` below.
 
-- A website (pages served to a browser): `<exact2>/docs/start-here-site.md`
-- Any other app: `<exact2>/docs/start-here.md`
+## 2. Read the one required guide
 
-Read only that guide before starting. Everything else in the checkout is lookup. Do not
-read `AGENTS.md`; it is for work on Exact itself.
+- Website: `<exact>/docs/start-here-site.md`
+- Any other app: `<exact>/docs/start-here.md`
 
-## 4. Make and verify the app
+Read only that guide before starting. Do not read `AGENTS.md` (Exact's own work).
+
+## 3. Make and verify the app
 
 ```sh
-bun <exact2>/scripts/exact.mjs new <path>
+bun <exact>/scripts/exact.mjs new <path>
 cd <path>
-bun exact.mjs pattern        # list the starter patterns; `pattern site` for a website
+bun exact.mjs pattern        # list starters; `pattern site` for a website
 bun exact.mjs verify         # build, run app.test.contract, check screens
 ```
 
-Start from the nearest pattern, replace the placeholder screen and tests, and put
-the view in Contract with data logic in `app.ts`. `verify` is the gate; a clean run on the
-app's platform is done. Drive an app by hand with `bun exact.mjs agent web ...`
-(or `bun <exact2>/scripts/agent.mjs web ...`).
+After the Exact checkout moves, in an existing app: `bun exact.mjs update`
+rewrites generated Exact paths/patches; if it reports lock drift, run
+`bun exact.mjs lock`.
 
-First native builds (macOS, iOS) take roughly 10 to 15 minutes. Run them in the
-background and watch the output.
+Start from the nearest pattern, put the view in Contract and data logic in
+`app.ts`. `verify` is the gate. Drive by hand with `bun exact.mjs agent web ...`.
 
-## 5. Feedback
+## 4. Feedback
 
-Exact does not take pull requests. Bugs, confusing docs and missing capabilities go in
-issues at `github.com/expo/exact`, ideally with the smallest `app.contract` that shows
-the problem. Ask the user before filing one.
+Exact does not take pull requests. Bugs and missing capabilities go to
+`github.com/expo/exact` issues — ask the user before filing.
