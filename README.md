@@ -44,7 +44,9 @@ skills directory, or run [`scripts/exact-bootstrap.sh`](scripts/exact-bootstrap.
   `bun scripts/exact.mjs setup` only when the checkout HEAD changed since the
   last successful setup.
 - **SessionStart:** Claude Code and Codex load `hooks/hooks.json`, which runs
-  the bootstrap in `--auto` mode. It probes
+  the bootstrap in `--auto` mode. It does nothing unless the session is inside
+  an Exact app (a folder, or a parent of it, with `app.contract` or
+  `exact.mjs`) or the Exact checkout itself. There, it probes
   `git ls-remote https://github.com/expo/exact.git HEAD` with a short timeout and
   compares that to the local checkout. Matching or unreachable HEADs exit
   immediately and silently; only when upstream has moved does it fetch,
