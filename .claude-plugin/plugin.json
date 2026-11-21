@@ -1,7 +1,7 @@
 {
   "name": "exact",
-  "version": "0.2.0",
-  "description": "Build, run and test apps with Exact (expo/exact) by cloning the upstream checkout and following its start-here guide.",
+  "version": "0.3.0",
+  "description": "Build, run and test apps with Exact (expo/exact): auto-setup of the upstream checkout, SessionStart updates, and its start-here guide.",
   "author": {
     "name": "GamerDubz"
   },

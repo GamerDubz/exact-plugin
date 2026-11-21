@@ -1,0 +1,141 @@
+name: Upstream Exact check
+
+on:
+  schedule:
+    - cron: "17 7 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: upstream-exact-check
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout plugin
+        uses: actions/checkout@v4
+
+      - name: Checkout expo/exact
+        uses: actions/checkout@v4
+        with:
+          repository: expo/exact
+          path: _exact_upstream
+
+      - name: Verify paths the skill and bootstrap rely on
+        id: layout
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="_exact_upstream"
+          missing=0
+          for path in \
+            scripts/exact.mjs \
+            docs/start-here.md \
+            docs/start-here-site.md \
+            rust-toolchain.toml \
+            package.json
+          do
+            if [[ ! -e "$ROOT/$path" ]]; then
+              echo "::error::missing $path"
+              missing=1
+            else
+              echo "ok $path"
+            fi
+          done
+
+          if ! grep -q 'packageManager' "$ROOT/package.json"; then
+            echo "::error::package.json has no packageManager (Bun pin source)"
+            missing=1
+          else
+            pin="$(sed -n 's/.*"packageManager"[[:space:]]*:[[:space:]]*"bun@\([^"]*\)".*/\1/p' "$ROOT/package.json" | head -n1)"
+            if [[ -z "$pin" ]]; then
+              echo "::error::could not read bun@ pin from packageManager"
+              missing=1
+            else
+              echo "Bun pin: $pin"
+              echo "bun_pin=$pin" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+          if ! grep -Eq "verb === 'setup'" "$ROOT/scripts/exact.mjs"; then
+            echo "::error::scripts/exact.mjs does not expose setup"
+            missing=1
+          else
+            echo "ok setup subcommand"
+          fi
+
+          if [[ "$missing" -ne 0 ]]; then
+            echo "layout_ok=false" >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
+          echo "layout_ok=true" >> "$GITHUB_OUTPUT"
+
+      - name: Bootstrap --check
+        id: bootstrap
+        continue-on-error: true
+        shell: bash
+        env:
+          EXACT: ${{ github.workspace }}/_exact_upstream
+        run: |
+          set +e
+          chmod +x scripts/exact-bootstrap.sh
+          scripts/exact-bootstrap.sh --check
+          status=$?
+          echo "bootstrap_exit=$status" >> "$GITHUB_OUTPUT"
+          if [[ "$status" -ne 0 ]]; then
+            echo "bootstrap_ok=false" >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
+          echo "bootstrap_ok=true" >> "$GITHUB_OUTPUT"
+
+      - name: Open or update drift issue
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LAYOUT_OK: ${{ steps.layout.outputs.layout_ok }}
+          BOOTSTRAP_OK: ${{ steps.bootstrap.outputs.bootstrap_ok }}
+          BOOTSTRAP_EXIT: ${{ steps.bootstrap.outputs.bootstrap_exit }}
+        run: |
+          set -euo pipefail
+          TITLE="Upstream Exact layout or bootstrap drift"
+          LABEL_BODY="Tracked by .github/workflows/upstream-check.yml — do not open duplicates."
+
+          failed=0
+          if [[ "${LAYOUT_OK:-false}" != "true" ]]; then failed=1; fi
+          if [[ "${BOOTSTRAP_OK:-false}" != "true" ]]; then failed=1; fi
+
+          existing="$(gh issue list --state open --search "in:title Upstream Exact layout or bootstrap drift" --json number,title --jq '.[] | select(.title=="Upstream Exact layout or bootstrap drift") | .number' | head -n1 || true)"
+
+          if [[ "$failed" -eq 0 ]]; then
+            if [[ -n "${existing:-}" ]]; then
+              gh issue close "$existing" --comment "Upstream check is green again on ${GITHUB_SHA}. Closing."
+            fi
+            echo "All checks passed."
+            exit 0
+          fi
+
+          body="$(cat <<EOF
+          $LABEL_BODY
+
+          Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}
+          Commit: ${GITHUB_SHA}
+
+          - Layout ok: ${LAYOUT_OK:-false}
+          - Bootstrap --check ok: ${BOOTSTRAP_OK:-false} (exit ${BOOTSTRAP_EXIT:-unknown})
+
+          The workflow only reports; it does not push commits. Inspect the job log, then update the skill/bootstrap if expo/exact moved.
+          EOF
+          )"
+
+          if [[ -n "${existing:-}" ]]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "$TITLE" --body "$body"
+          fi
+          exit 1

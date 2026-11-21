@@ -8,7 +8,7 @@
     {
       "name": "exact",
       "source": "./",
-      "description": "Clone expo/exact, run its setup, and follow its start-here guide to build, run and test an Exact app.",
+      "description": "Auto-setup and update expo/exact, then follow its start-here guide to build, run and test an Exact app.",
       "category": "development",
       "keywords": [
         "exact",
